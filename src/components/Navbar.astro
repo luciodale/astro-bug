@@ -1,0 +1,30 @@
+---
+import Navbar from "./Navbar";
+
+export type PageProps = {
+  metadata?: {
+    navbar?: { weight?: number; label?: string; url?: string };
+    footer?: { weight?: number; label?: string; url?: string };
+  };
+  url: string;
+};
+
+const url = new URL(Astro.request.url);
+const currentPage = url.pathname;
+
+const pages = await Astro.glob<PageProps>("../pages/**/*.astro");
+
+const pagesInNavbar = pages
+  .filter((page) => page?.metadata?.navbar)
+  .map((page) => ({
+    url: page.metadata?.navbar?.url || page.url,
+    weight: page.metadata?.navbar?.weight,
+    label: page.metadata?.navbar?.label || page.url,
+    active: page.url === currentPage,
+  }))
+  .sort((a, b) => a.weight - b.weight);
+
+const isBlog = Astro.canonicalURL.pathname.includes("/blog/");
+---
+
+<Navbar client:visible navLinks={pagesInNavbar} isBlog={isBlog} />

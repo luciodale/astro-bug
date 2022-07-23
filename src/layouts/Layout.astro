@@ -1,0 +1,47 @@
+---
+import Footer from "../components/Footer.astro";
+import Navbar from "../components/Navbar.astro";
+
+type LayoutProps = {
+  title?: string;
+  navbar?: boolean;
+};
+
+const url = new URL(Astro.request.url);
+const currentPage = url.pathname;
+
+const { title, navbar } = Astro.props as LayoutProps;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- remove when we go public!! -->
+    <meta name="robots" content="noindex" />
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <title>{title || currentPage}</title>
+    <!-- This is intentionally inlined to avoid FOUC -->
+    <script>
+      const root = document.documentElement;
+      const theme = localStorage.getItem("theme");
+      if (
+        theme === "dark" ||
+        (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        root.classList.add("dark");
+      } else {
+        root.classList.remove("dark");
+      }
+    </script>
+  </head>
+  <body>
+    {navbar && <Navbar />}
+    <div class="pt-14">
+      <slot></slot>
+      <Footer />
+    </div>
+  </body>
+</html>
